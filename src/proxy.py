@@ -84,7 +84,8 @@ class Proxy:
                     "./key/kaouka-460308906bec.json")
             else:
                 cred = credentials.Certificate("/key/kaouka-460308906bec.json")
-            firebase_admin.initialize_app(cred)
+            app_name = f"firebase_app_{os.getpid()}"
+            firebase_admin.initialize_app(cred, name=app_name)
         except Exception as e:
             logger.critical("init firebase error: " + str(e))
 
