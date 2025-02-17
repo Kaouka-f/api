@@ -1,0 +1,14 @@
+flask
+redis
+python-dotenv
+pymongo
+PyJWT
+python-socketio
+firebase-admin
+Flask-Limiter
+flask_cors
+timeout_decorator
+ffmpeg-python
+pillow
+gunicorn
+gevent

@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-service
+spec:
+  selector:
+    app: proxy
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30100
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy
+spec:
+  selector:
+    matchLabels:
+      app: proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+        - name: proxy
+          image: proxy
+          imagePullPolicy: Never
+          command: ["sh", "-c"]
+          args: ["python -m venv venv && . venv/bin/activate && pip install -r requirements.txt && . venv/bin/activate && python /app/main.py 0.0.0.0 8000"]
+          ports:
+            - name: proxy-port
+              containerPort: 8000
+          volumeMounts:
+            - name: firebase
+              mountPath: /key
+              readOnly: true
+            - name: streaming-data
+              mountPath: /opt/files
+          env:
+            - name: redis_srv
+              value: "redis-service"
+      hostNetwork: true
+      volumes:
+        - name: firebase
+          secret:
+            secretName: firebase-conf
+        - name: streaming-data
+          persistentVolumeClaim:
+            claimName: streaming-server-pvc
+      dnsPolicy: ClusterFirstWithHostNet
+      dnsConfig:
+        nameservers:
+          - 10.96.0.10
+        options:
+          - name: ndots
+            value: "5"

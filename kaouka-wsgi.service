@@ -1,0 +1,18 @@
+[Unit]
+Description=Kaouka WSGI
+After=network.target
+
+[Service]
+User=k8s-user
+Group=www-data
+WorkingDirectory=/home/k8s-user/ctj/server/proxy/src
+ExecStart=/home/k8s-user/venv/bin/gunicorn -k gevent -w 4 -b 0.0.0.0:8000 proxy:app
+StandardOutput=append:/var/log/kaouka.log
+StandardError=append:/var/log/kaouka.log
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=kaouka proxy
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+ExecStart=/home/k8s-user/venv/bin/python /home/k8s-user/ctj/server/proxy/src/main.py 0.0.0.0 8000
+Restart=on-failure
+StandardOutput=append:/var/log/kaouka.log
+StandardError=append:/var/log/kaouka.log
+
+[Install]
+WantedBy=multi-user.target
