@@ -14,6 +14,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg',
                       'gif', 'mp4', 'mov', 'avi', 'mkv', 'webm'}
 FILE_PATH = '/opt/files/'
 
+EMAIL_PASSWORD = os.environ.get("")
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -209,13 +211,20 @@ def delete_fcm_instance(fcm_token):
         print(f"Error deleting the app instance: {e}")
 
 
-EMAIL_PASSWORD = os.environ.get("")
-
-
-def sendNotif(notifToken, title, message, badge=1):
+def sendNotif(notifToken, title, message, badge=1, image_url=None):
     try:
+        app_name = f"firebase_app_{os.getpid()}"
+        app = firebase_admin.get_app(app_name)
+        notification = messaging.Notification(
+            title=title,
+            body=message,
+            image=image_url  # Set image URL here
+        ) if image_url else messaging.Notification(
+            title=title,
+            body=message
+        )
         msg = messaging.Message(
-            notification=messaging.Notification(title=title, body=message),
+            notification=notification,
             token=notifToken,
             android=messaging.AndroidConfig(priority="high"),
             apns=messaging.APNSConfig(
@@ -239,7 +248,7 @@ def sendNotif(notifToken, title, message, badge=1):
                 ),
             ),
         )
-        id = messaging.send(msg)
+        id = messaging.send(msg, app=app)
         return id
     except Exception as e:
         return str(e)

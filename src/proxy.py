@@ -67,6 +67,8 @@ from analyzer.deleteHash import deleteHashEntry
 #     storage_uri="memory://",
 # )
 
+mode = os.environ.get('MODE')
+
 
 class Proxy:
     user_connected = 0
@@ -78,7 +80,6 @@ class Proxy:
 
         # firebase init
         try:
-            mode = os.environ.get('MODE')
             if mode == 'test':
                 cred = credentials.Certificate(
                     "./key/kaouka-460308906bec.json")
@@ -184,8 +185,12 @@ class Proxy:
         # HTTPS
         # app.run(ssl_context=(self.certfile, self.keyfile), host='0.0.0.0', port=self.port, debug="on")
         # HTTP
-        self.app.run(host='0.0.0.0', port=8000, debug=False)
+        if mode == "test":
+            self.app.run(host='0.0.0.0', port=8000, debug=True)
+        else:
+            self.app.run(host='0.0.0.0', port=8000, debug=False)
 
 
-proxy = Proxy()
-app = proxy.app
+if mode != "test":
+    proxy = Proxy()
+    app = proxy.app

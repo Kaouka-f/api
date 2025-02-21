@@ -11,7 +11,8 @@ from firebase_admin import credentials, messaging
 import firebase_admin
 from utils import createFile, sendNotif, mediaType
 
-def sendMsg(targetPersonId, personId, message, file, filename, ext):
+
+def sendMsg(targetPersonId, personId, message, file):
     redis = RedisIface()
     try:
         # Check if id is valid
@@ -19,13 +20,13 @@ def sendMsg(targetPersonId, personId, message, file, filename, ext):
         if personId == None:
             del redis
             logger.critical("proxy sendMsg id error")
-            return {'result':"false"}
+            return {'result': "false"}
         # TODO check isBlocked user
         req_result = redis.redis_hget(targetPersonId, 'blockedUser')
         if req_result != "":
             requests_list = json.loads(req_result)
             if personId in requests_list:
-                return {'result':"blocked"}
+                return {'result': "blocked"}
         # create file
         media = ""
         if file:
@@ -33,12 +34,12 @@ def sendMsg(targetPersonId, personId, message, file, filename, ext):
         # push msg in redis
         msgid = str(uuid.uuid4())
         current_time_utc = datetime.now(timezone.utc)
-        timestamp =  current_time_utc.timestamp()
+        timestamp = current_time_utc.timestamp()
         redis.redis_hset("msg:"+msgid, 'personId', personId)
         redis.redis_hset("msg:"+msgid, 'message', message)
         redis.redis_hset("msg:"+msgid, 'media', media)
         redis.redis_hset("msg:"+msgid, 'ts', timestamp)
-        
+
         # push msg in user
         badge = 0
         msg_list_json = redis.redis_hget(targetPersonId, 'msgs')
@@ -55,30 +56,33 @@ def sendMsg(targetPersonId, personId, message, file, filename, ext):
         # send notif
         pseudo = redis.redis_hget(personId, 'name')
         token = redis.redis_hget(targetPersonId, 'notifToken')
-        sendNotif(token, pseudo, message, badge)
+        msgRet = sendNotif(token, pseudo, message, badge)
+        logger.error(msgRet)
         del redis
-        return {'result':"true",'media': media}
+        return {'result': "true", 'media': media}
     except RedisError as e:
         del redis
         logger.critical("proxy sendMsg error redis: " + str(e))
-        return {'result':"false"}
+        return {'result': "false"}
     except Exception as e:
         del redis
         logger.critical("proxy sendMsg args error: " + str(e))
-        return {'result':"false"}
+        return {'result': "false"}
+
 
 def sendMsgEntry():
     try:
         request = flask.request
-        targetPersonId = request.args.get('targetPersonId')
-        personId = request.args.get('personId')
-        message = request.args.get('message')
-        filename = request.args.get('filename')
-        ext = request.args.get('ext')
+        request_json = request.get_json()
+        targetPersonId = request_json['targetPersonId']
+        personId = request_json['personId']
+        message = request_json['message']
+        # filename = request_json['filename']
+        # ext = request_json['ext']
         file = None
         if 'file' in request.files:
             file = request.files['file']
-        return sendMsg(targetPersonId, personId, message, file, filename, ext)
+        return sendMsg(targetPersonId, personId, message, file)
     except Exception as e:
         logger.critical("proxy sendMsg args error: " + str(e))
-        return {'result':'false'}
+        return {'result': 'false'}

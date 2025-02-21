@@ -5,6 +5,7 @@ from logger import logger
 from utils import sendNotif
 from redisIface import RedisIface
 
+
 def likeReq(id, reqId):
     redis = RedisIface()
     try:
@@ -25,10 +26,14 @@ def likeReq(id, reqId):
         targetid = redis.redis_hget(reqId, "id")
         notifToken = redis.redis_hget(targetid, "notifToken")
         pseudo = redis.redis_hget(id, "name")
+        pp = redis.redis_hget(id, "img")
+        if not pp:
+            pp = "https://elaborium.site/proxy/stream/default/profile.jpg"
         if id not in likes:
             likes.append(id)
             likesNb = int(likesNb) + 1
-            sendNotif(notifToken, pseudo, "à aimé ton post")
+            n = sendNotif(notifToken, pseudo, "à aimé ton post", image_url=pp)
+            print(n)
             # add in req of interressed
             reqOI_json_array = redis.redis_hget(id, 'requestsOfInterressed')
             reqOI_list = []
@@ -39,11 +44,12 @@ def likeReq(id, reqId):
                 reqOI_list = []
                 reqOI_list.append(reqId)
             updated_reqOI_json_array = json.dumps(reqOI_list)
-            redis.redis_hset(id, "requestsOfInterressed", updated_reqOI_json_array)
+            redis.redis_hset(id, "requestsOfInterressed",
+                             updated_reqOI_json_array)
         else:
             likes.remove(id)
             likesNb = int(likesNb) - 1
-            sendNotif(notifToken, pseudo, "n'aime plus ton post")
+            sendNotif(notifToken, pseudo, "n'aime plus ton post", image_url=pp)
             # delete in req of interressed
             reqOI_json_array = redis.redis_hget(id, 'requestsOfInterressed')
             reqOI_list = []
@@ -52,7 +58,8 @@ def likeReq(id, reqId):
                 if reqId in reqOI_list:
                     reqOI_list.remove(reqId)
             updated_reqOI_json_array = json.dumps(reqOI_list)
-            redis.redis_hset(id, "requestsOfInterressed", updated_reqOI_json_array)
+            redis.redis_hset(id, "requestsOfInterressed",
+                             updated_reqOI_json_array)
         newLikes = json.dumps(likes)
         redis.redis_hset(reqId, "likeNb", str(likesNb))
         redis.redis_hset(reqId, "likes", newLikes)
@@ -65,6 +72,7 @@ def likeReq(id, reqId):
     except Exception as e:
         del redis
         logger.critical("proxy likeReq error: " + str(e))
+
 
 def likeReqEntry():
     try:
