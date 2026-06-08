@@ -8,6 +8,9 @@ from redis.exceptions import RedisError
 import os
 from utils import createFile
 
+from schema.database import SessionLocal
+from schema.models import Request, User
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'mkv', 'webm'}
 FILE_PATH = '/opt/files/'
 def allowed_file(filename):
@@ -16,6 +19,7 @@ def allowed_file(filename):
 
 def postReq(id, req, file):
     redis = RedisIface()
+    session = SessionLocal()
     file_present = False
     # save file if present
     try:

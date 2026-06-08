@@ -1,21 +1,21 @@
-import os
 import flask
 from logger import logger
 from redisIface import RedisIface
 from utils import createFile
+
 
 def postPP(id, pp):
     redis = RedisIface()
     try:
         # Check if id is valid
         id = redis.check_id(id)
-        if id == None:
+        if id is None:
             del redis
             logger.critical("proxy postPP id error")
             return {}
         file_present = False
         ppname = ""
-        if pp != None:
+        if pp is not None:
             # TODO: need authentication
             ppname = createFile(pp, id)
             file_present = True
@@ -24,9 +24,10 @@ def postPP(id, pp):
         del redis
         return ppname
     except Exception as e:
-        del redis
-        logger.critical("proxy Error while working postPP with Redis: " + str(e))
+        logger.critical(
+            "proxy Error while working postPP with Redis: " + str(e))
         return 'unset'
+
 
 def postPPEntry():
     try:

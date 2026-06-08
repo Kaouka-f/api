@@ -8,24 +8,27 @@ from redisIface import RedisIface
 
 FILE_PATH = '/opt/files/'
 
+
 def deleteReqStatic(redis, reqId):
     try:
         # Delete all comments from requests
         requests_json_array = redis.redis_hget(reqId, 'comments')
         updated_comments = []
+
         def recursive_get_comment(comments):
             comments_list = json.loads(comments)
             for commentId in comments_list:
                 updated_comments.append(commentId)
                 if redis.redis.hexists(commentId, 'comments'):
-                    commentId_json_array = redis.redis_hget(commentId, 'comments')
+                    commentId_json_array = redis.redis_hget(
+                        commentId, 'comments')
                     recursive_get_comment(commentId_json_array)
-        if requests_json_array != None and requests_json_array != "":
+        if requests_json_array is not None and requests_json_array != "":
             recursive_get_comment(requests_json_array)
             for commentId in updated_comments:
                 # delete media
                 media = redis.redis_hget(commentId, 'media')
-                if media != None and media != "":
+                if media is not None and media != "":
                     medias_json = json.loads(media)
                     for media_json in medias_json:
                         parsed_url = urlparse(media_json)
@@ -35,7 +38,7 @@ def deleteReqStatic(redis, reqId):
                 redis.redis_deleteall(commentId)
         # Delete media from request
         media = redis.redis_hget(reqId, 'media')
-        if media != None and media != "":
+        if media is not None and media != "":
             parsed_url = urlparse(media)
             path = parsed_url.path
             if os.path.exists(FILE_PATH + path):
@@ -47,7 +50,7 @@ def deleteReqStatic(redis, reqId):
             attachReqId = redis.redis.hget(reqId, 'attachReqId')
             # decrease comment nb
             commentNb = redis.redis_hget(attachReqId, "commentNb")
-            if commentNb != None and commentNb != "":
+            if commentNb is not None and commentNb != "":
                 commentNb = int(commentNb)
             else:
                 commentNb = 0
@@ -56,7 +59,7 @@ def deleteReqStatic(redis, reqId):
             # delete comment in request key
             comments_json_array = redis.redis_hget(attachReqId, 'comments')
             comments_list = []
-            if comments_json_array != None and comments_json_array != "":
+            if comments_json_array is not None and comments_json_array != "":
                 comments_list = json.loads(comments_json_array)
                 if reqId in comments_list:
                     comments_list.remove(reqId)
@@ -70,7 +73,7 @@ def deleteReqStatic(redis, reqId):
             id = redis.redis_hget(reqId, 'id')
             request_json_array = redis.redis_hget(id, 'requests')
             requests_list = []
-            if request_json_array != None and request_json_array != "":
+            if request_json_array is not None and request_json_array != "":
                 requests_list = json.loads(request_json_array)
                 if reqId in requests_list:
                     requests_list.remove(reqId)
@@ -82,17 +85,19 @@ def deleteReqStatic(redis, reqId):
         return {}
     except RedisError as e:
         print(f"Error while working with Redis: {e}")
-        logger.critical("proxy Error in deleteReq while working with Redis deleteReq: " + str(e))
+        logger.critical(
+            "proxy Error in deleteReq while working with Redis deleteReq: " + str(e))
         return {}
     except Exception as e:
         logger.critical("proxy deleteReq args error: " + str(e))
+
 
 def deleteReq(id, reqId):
     redis = RedisIface()
     try:
         # Check if id is valid
         id = redis.check_id(id)
-        if id == None:
+        if id is None:
             del redis
             logger.critical("proxy deleteReq id error")
             return {}
@@ -100,10 +105,11 @@ def deleteReq(id, reqId):
         del redis
         return res
     except RedisError as e:
-        del redis
         print(f"Error while working with Redis: {e}")
-        logger.critical("proxy Error in deleteReq while working with Redis deleteReq: " + str(e))
+        logger.critical(
+            "proxy Error in deleteReq while working with Redis deleteReq: " + str(e))
         return {}
+
 
 def deleteReqEntry():
     try:

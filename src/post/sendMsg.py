@@ -1,15 +1,11 @@
-import base64
 from datetime import datetime, timezone
 import json
-import os
 import uuid
 import flask
 from redis.exceptions import RedisError
 from logger import logger
 from redisIface import RedisIface
-from firebase_admin import credentials, messaging
-import firebase_admin
-from utils import createFile, sendNotif, mediaType
+from utils import createFile, sendNotif
 
 
 def sendMsg(targetPersonId, personId, message, file):
@@ -17,14 +13,14 @@ def sendMsg(targetPersonId, personId, message, file):
     try:
         # Check if id is valid
         personId = redis.check_id(personId)
-        if personId == None:
+        if personId is None:
             del redis
             logger.critical("proxy sendMsg id error")
             return {'result': "false"}
         # TODO check isBlocked user
         req_result = redis.redis_hget(targetPersonId, 'blockedUser')
         if req_result != "":
-            requests_list = json.loads(req_result)
+            requests_list = json.loads(str(req_result))
             if personId in requests_list:
                 return {'result': "blocked"}
         # create file
@@ -44,8 +40,8 @@ def sendMsg(targetPersonId, personId, message, file):
         badge = 0
         msg_list_json = redis.redis_hget(targetPersonId, 'msgs')
         msg_list = []
-        if msg_list_json != None and msg_list_json != "":
-            msg_list = json.loads(msg_list_json)
+        if msg_list_json is not None and msg_list_json != "":
+            msg_list = json.loads(str(msg_list_json))
             msg_list.append(msgid)
         else:
             msg_list = []
@@ -61,11 +57,9 @@ def sendMsg(targetPersonId, personId, message, file):
         del redis
         return {'result': "true", 'media': media}
     except RedisError as e:
-        del redis
         logger.critical("proxy sendMsg error redis: " + str(e))
         return {'result': "false"}
     except Exception as e:
-        del redis
         logger.critical("proxy sendMsg args error: " + str(e))
         return {'result': "false"}
 

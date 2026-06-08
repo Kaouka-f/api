@@ -3,12 +3,13 @@ from redis.exceptions import RedisError
 from logger import logger
 from redisIface import RedisIface
 
+
 def postLocation(id, long, lat):
     redis = RedisIface()
     try:
         # Check if id is valid
         id = redis.check_id(id)
-        if id == None:
+        if id is None:
             del redis
             logger.critical("proxy post location id error")
             return {}
@@ -16,12 +17,11 @@ def postLocation(id, long, lat):
         del redis
         return {}
     except RedisError as e:
-        del redis
         logger.critical("proxy post location error redis: " + str(e))
         return {}
     except Exception as e:
-        del redis
         logger.critical("proxy post location args error: " + str(e))
+
 
 def postLocationEntry():
     try:

@@ -1,15 +1,12 @@
 import os
 from flask import Flask
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_remote_address
 
 import flask
-from redis.exceptions import RedisError
 from logger import logger
-from redisIface import RedisIface
-import datetime
-from firebase_admin import credentials, messaging
+from firebase_admin import credentials
 import firebase_admin
 
 ###########
@@ -28,6 +25,7 @@ from get.getFeed import getFeedEntry
 from get.streamer import stream_file
 from get.getMsgs import getMsgsEntry
 from get.getInterressed import getInterressedEntry
+from get.getGraphqlUser import getGraphqlUserEntry
 from get.preview import previewEntry
 from get.isBlocked import isBlockedEntry
 # POST
@@ -35,6 +33,7 @@ from post.postReq import postReqEntry
 from post.visible import visibleEntry
 from post.postNotifToken import postNotifTokenEntry
 from post.postName import postNameEntry
+from post.postGraphqlUser import postGraphqlUserEntry
 from post.postPP import postPPEntry
 from post.postPPSetting import postPPSettingEntry
 from post.onConnection import onConnection
@@ -103,6 +102,8 @@ class Proxy:
         self.app.route('/proxy/getMsgs', methods=['GET'])(getMsgsEntry)
         self.app.route('/proxy/getInterressed',
                        methods=['GET'])(getInterressedEntry)
+        self.app.route('/proxy/getGraphqlUser',
+                       methods=['GET'])(getGraphqlUserEntry)
         self.app.route('/proxy/isBlocked', methods=['GET'])(isBlockedEntry)
 
         self.app.route('/proxy/postReq', methods=['POST'])(postReqEntry)
@@ -113,6 +114,8 @@ class Proxy:
         self.app.route('/proxy/postPPSetting',
                        methods=['POST'])(postPPSettingEntry)
         self.app.route('/proxy/postName', methods=['POST'])(postNameEntry)
+        self.app.route('/proxy/postGraphqlUser',
+                       methods=['POST'])(postGraphqlUserEntry)
         self.app.route('/proxy/onConnection',
                        methods=['POST'])(self.onConnectionEntry)
         self.app.route('/proxy/onDisconnection',
@@ -186,6 +189,7 @@ class Proxy:
         # app.run(ssl_context=(self.certfile, self.keyfile), host='0.0.0.0', port=self.port, debug="on")
         # HTTP
         if mode == "test":
+            print('run proxy in MODE test')
             self.app.run(host='0.0.0.0', port=8000, debug=True)
         else:
             self.app.run(host='0.0.0.0', port=8000, debug=False)

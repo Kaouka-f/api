@@ -2,3 +2,4 @@ __pycache__
 key
 gunicorn_*
 server.log
+src/.env

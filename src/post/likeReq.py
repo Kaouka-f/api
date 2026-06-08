@@ -63,10 +63,9 @@ def likeReq(id, reqId):
         newLikes = json.dumps(likes)
         redis.redis_hset(reqId, "likeNb", str(likesNb))
         redis.redis_hset(reqId, "likes", newLikes)
-        del redis
+        redis.close()
         return {}
     except RedisError as e:
-        del redis
         print(f"Error while working with Redis likeReq: {e}")
         return {}
     except Exception as e:

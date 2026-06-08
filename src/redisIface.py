@@ -4,6 +4,7 @@ from redis.exceptions import RedisError
 import os
 from logger import logger
 
+
 class RedisIface:
     def __init__(self):
         try:
@@ -13,7 +14,8 @@ class RedisIface:
             # tcp
             redis_host = "localhost"
             redis_port = 6379
-            self.redis = redis.StrictRedis(host=redis_host, port=redis_port, decode_responses=True)
+            self.redis = redis.StrictRedis(
+                host=redis_host, port=redis_port, decode_responses=True)
         except Exception as e:
             print("Redis connection error: " + str(e))
             exit(1)
@@ -22,8 +24,13 @@ class RedisIface:
         self.redis.close()
         del self.redis
 
+    def close(self):
+        self.redis.close()
+        del self.redis
+
     def redis_ttl(self):
-        return self.redis.ttl()
+        pass
+        # return self.redis.ttl()
 
     def redis_expireat(self, key, expireSet):
         self.redis.expireat(key, expireSet)
@@ -50,6 +57,8 @@ class RedisIface:
         try:
             keyEncoded = key
             res = self.redis.hgetall(keyEncoded)
+            print(res)
+            print(res.items())
             decoded_result = {}
             if res:
                 decoded_result = {key: value for key, value in res.items()}
@@ -82,7 +91,7 @@ class RedisIface:
         self.redis.zrem(key, field)
 
     def check_id(self, encodedId):
-        if(encodedId == None):
+        if (encodedId == None):
             return None
         id, privateId = utils.decodeId(encodedId)
         if privateId == self.redis.hget(id, 'privateid'):

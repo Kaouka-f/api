@@ -2,6 +2,8 @@ flask
 redis
 python-dotenv
 pymongo
+psycopg2-binary
+SQLAlchemy
 PyJWT
 python-socketio
 firebase-admin
