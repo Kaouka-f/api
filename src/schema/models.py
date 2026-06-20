@@ -23,7 +23,8 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    private_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     image: Mapped[str | None] = mapped_column(Text, nullable=True)
     notif_token: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, g
 from flask_cors import CORS
 # from flask_limiter import Limiter
 # from flask_limiter.util import get_remote_address
@@ -8,6 +8,8 @@ import flask
 from logger import logger
 from firebase_admin import credentials
 import firebase_admin
+
+from schema.database import SessionLocal, engine, Base
 
 ###########
 # METHODS #
@@ -50,6 +52,7 @@ from post.deleteMsg import deleteMsgEntry
 from post.deleteInterressed import deleteInterressedEntry
 from post.blockUser import blockUserEntry
 from post.postLocation import postLocationEntry
+from post.signUp import signUpEntry
 
 # ANALYZER
 from analyzer.getBots import getBotsEntry
@@ -76,6 +79,22 @@ class Proxy:
         self.app = Flask(__name__)
         # server init
         CORS(self.app)
+        @self.app.before_request
+        def before_request():
+            g.db = SessionLocal()
+
+        @self.app.teardown_request
+        def teardown_request(exception=None):
+            db = getattr(g, "db", None)
+            
+            if db:
+                try:
+                    if exception:
+                        db.rollback()
+                    else:
+                        db.commit()
+                finally:
+                    db.close()
 
         # firebase init
         try:
@@ -136,6 +155,7 @@ class Proxy:
         self.app.route('/proxy/blockUser', methods=['POST'])(blockUserEntry)
         self.app.route('/proxy/postLocation',
                        methods=['POST'])(postLocationEntry)
+        self.app.route('/proxy/signUp', methods=['POST'])(signUpEntry)
 
         # Stream
         self.app.route('/proxy/stream/<path:subpath>',

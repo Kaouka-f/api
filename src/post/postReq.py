@@ -2,6 +2,8 @@ import json
 import time
 import uuid
 import flask
+from flask import g
+from redis_client import redis_client
 from logger import logger
 from redisIface import RedisIface
 from redis.exceptions import RedisError
@@ -19,7 +21,7 @@ def allowed_file(filename):
 
 def postReq(id, req, file):
     redis = RedisIface()
-    session = SessionLocal()
+    db = g.db
     file_present = False
     # save file if present
     try:

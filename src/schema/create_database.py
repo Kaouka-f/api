@@ -19,7 +19,7 @@ import psycopg2
 from psycopg2 import sql
 from sqlalchemy.engine.url import make_url
 
-from schema.database import Base, build_database_url, engine
+from database import Base, build_database_url, engine
 
 
 def ensure_postgres_database_exists() -> None:
@@ -62,7 +62,7 @@ def create_schema_tables() -> None:
     try:
         from schema import models  # noqa: F401
     except ModuleNotFoundError:
-        from . import models  # type: ignore  # noqa: F401
+        import models  # type: ignore  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
 
