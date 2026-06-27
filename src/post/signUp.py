@@ -29,6 +29,7 @@ def signUp(password, email):
         # link = create_confirmation_link(id)
         # send_confirmation_email(email, link)
         
+        # TODO: encrypt password before storing it in the database (e.g., using bcrypt)
 
         user = User(
             id=str(uuid.uuid4()),
@@ -51,8 +52,6 @@ def signUpEntry():
         request_json = request.get_json()
         email = request_json['email']
         password = request_json['password']
-        print("Email:", email)
-        print("Password:", password)
         if not email or not password:
             return {"presubscribe": True, "info": "missing_fields"}
         return signUp(password=password, email=email)
