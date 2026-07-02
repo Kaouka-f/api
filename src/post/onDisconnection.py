@@ -12,7 +12,7 @@ def onDisconnection(id):
             del redis
             logger.critical("proxy onDisconnection id error")
             return {}
-        redis.redis_hset(id, 'connected', 'false')
+        redis.redis_hset(f"user:{id}", 'connected', 'false')
         # self.nb_conn -= 1
         del redis
         return {}

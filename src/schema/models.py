@@ -26,13 +26,13 @@ class User(Base):
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    image: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # image: Mapped[str | None] = mapped_column(Text, nullable=True)
     notif_token: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    scale: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
-    offset_x: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
-    offset_y: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    # scale: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
+    # offset_x: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
+    # offset_y: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
 
     last_conn: Mapped[datetime.date] = mapped_column(Date, nullable=True)
     bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

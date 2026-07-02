@@ -4,8 +4,16 @@ from logger import logger
 from redisIface import RedisIface
 import datetime
 
+from flask import g
+
+from sqlalchemy import select
+
+from schema.models import User
+
+
 def onConnection(id):
     redis = RedisIface()
+    db = g.db
     try:
         # Check if id is valid
         id = redis.check_id(id)
@@ -14,8 +22,15 @@ def onConnection(id):
             logger.critical("proxy onConnection id error")
             return {}
         print(datetime.date.today())
-        redis.redis_hset(id, 'lastConn', str(datetime.date.today()))
-        redis.redis_hset(id, 'connected', 'true')
+        user = db.execute(select(User).where(User.id == id)).scalar_one_or_none()
+        if user:
+            user.last_conn = datetime.date.today()
+            db.commit()
+        else:
+            logger.critical("proxy onConnection user not found")
+            del redis
+            return {}
+        redis.redis_hset(f"user:{id}", 'connected', 'true')
         del redis
         return {}
     except RedisError as e:

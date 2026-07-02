@@ -7,7 +7,7 @@ def getInfos(personid):
         if personid:
             redis = RedisIface()
             json_object = {}
-            infos = redis.redis_hgetall(personid)
+            infos = redis.redis_hgetall(f"user:{personid}")
             json_object['name'] = infos['name'] if 'name' in infos else "undefined"
             json_object['img'] = infos['img'] if 'img' in infos else "https://elaborium.site/proxy/stream/default/profile.jpg"
             json_object['scale'] = infos['scale'] if 'scale' in infos else "1"

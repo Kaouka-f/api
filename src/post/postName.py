@@ -12,7 +12,7 @@ def postName(id, name):
             del redis
             logger.critical("proxy postName id error")
             return {}
-        redis.redis_hset(id, 'name', name)
+        redis.redis_hset(f"user:{id}", 'name', name)
         del redis
         return {}
     except Exception as e:

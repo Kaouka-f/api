@@ -13,9 +13,9 @@ def postPPSetting(id, scale, offsetX, offsetY):
             del redis
             logger.critical("proxy postPPSetting id error")
             return {}
-        redis.redis_hset(id, 'scale', scale)
-        redis.redis_hset(id, 'offsetX', offsetX)
-        redis.redis_hset(id, 'offsetY', offsetY)
+        redis.redis_hset(f"user:{id}", 'scale', scale)
+        redis.redis_hset(f"user:{id}", 'offsetX', offsetX)
+        redis.redis_hset(f"user:{id}", 'offsetY', offsetY)
         del redis
         return "false"
     except Exception as e:

@@ -20,7 +20,7 @@ def postPP(id, pp):
             ppname = createFile(pp, id)
             file_present = True
         if file_present:
-            redis.redis_hset(id, 'img', ppname)
+            redis.redis_hset(f"user:{id}", 'img', ppname)
         del redis
         return ppname
     except Exception as e:
