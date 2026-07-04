@@ -1,7 +1,7 @@
 import flask
 from redis.exceptions import RedisError
 from logger import logger
-from utils import get_random_file_in_folder
+from helper.media import get_random_file_in_folder
 from redisIface import RedisIface
 
 FILE_PATH = '/opt/files/videos'

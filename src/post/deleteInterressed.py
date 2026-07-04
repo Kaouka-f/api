@@ -2,7 +2,7 @@ import json
 import flask
 from redis.exceptions import RedisError
 from logger import logger
-from utils import sendNotif
+from helper.firebase import sendNotif
 from redisIface import RedisIface
 
 def deleteInterressed(id, reqId):

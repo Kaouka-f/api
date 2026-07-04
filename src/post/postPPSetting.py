@@ -2,7 +2,7 @@ import os
 import flask
 from logger import logger
 from redisIface import RedisIface
-FILE_PATH = '/opt/files/'
+from helper.media import FILE_PATH
 
 def postPPSetting(id, scale, offsetX, offsetY):
     redis = RedisIface()

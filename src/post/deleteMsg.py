@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 import flask
 from logger import logger
 from redisIface import RedisIface
-from utils import FILE_PATH
+from helper.media import FILE_PATH
 
 def deleteMsg(id, media):
     try:

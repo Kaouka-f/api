@@ -1,5 +1,5 @@
 import jwt
-from api.src.token import create_session_token, verify_persistent_token
+from helper.jwt import create_session_token, verify_persistent_token
 import flask
 import os
 

@@ -43,7 +43,7 @@ from post.deleteInterressed import deleteInterressed
 # print(getMsgs("5f77823b-a285-4b61-9f49-b4a341d5d259", 0))
 
 # test thumbnail
-from utils import create_video_thumbnail
+from helper.media import create_video_thumbnail
 file = "/opt/files/df36a9a2-65e6-435c-82d7-3b887f37fb63..mp4"
 output = "/opt/files/df36a9a2-65e6-435c-82d7-3b887f37fb63_thumbnail.jpg"
 create_video_thumbnail(file, output)

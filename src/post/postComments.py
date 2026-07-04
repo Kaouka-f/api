@@ -7,8 +7,8 @@ from redisIface import RedisIface
 from redis.exceptions import RedisError
 import os
 from firebase_admin import messaging
-from utils import createFile
-from utils import sendNotif
+from helper.file import createFile
+from helper.firebase import sendNotif
 
 def postComments(id, postId, comment, file):
     redis = RedisIface()

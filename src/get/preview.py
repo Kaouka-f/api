@@ -4,7 +4,7 @@ import requests
 from logger import logger
 from get.getRequest import getRequest
 import os
-from utils import mediaType, create_video_thumbnail
+from helper.media import mediaType, create_video_thumbnail
 
 def preview(reqId):
     # Fetch data from the external API

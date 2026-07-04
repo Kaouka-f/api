@@ -5,7 +5,8 @@ import flask
 from redis.exceptions import RedisError
 from logger import logger
 from redisIface import RedisIface
-from utils import createFile, sendNotif
+from helper.file import createFile
+from helper.firebase import sendNotif
 
 
 def sendMsg(targetPersonId, personId, message, file):

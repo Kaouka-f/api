@@ -1,4 +1,5 @@
-from utils import sendNotif, mediaType
+from helper.firebase import sendNotif 
+from helper.media import mediaType
 import firebase_admin
 from firebase_admin import credentials, messaging
 import sys

@@ -3,21 +3,15 @@ import time
 import uuid
 import flask
 from flask import g
-from redis_client import redis_client
+from core.redis_client import redis_client
 from logger import logger
 from redisIface import RedisIface
 from redis.exceptions import RedisError
 import os
-from utils import createFile
+from helper.file import createFile
 
 from schema.database import SessionLocal
 from schema.models import Request, User
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'mkv', 'webm'}
-FILE_PATH = '/opt/files/'
-def allowed_file(filename):
-    return '.' in filename and \
-       filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def postReq(id, req, file):
     redis = RedisIface()

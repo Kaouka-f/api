@@ -6,7 +6,7 @@ import os
 from logger import logger
 import flask
 from flask import g
-from api.src.token import create_persistent_token, create_session_token
+from helper.jwt import create_persistent_token, create_session_token
 
 from sqlalchemy import select
 

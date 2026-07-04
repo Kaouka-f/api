@@ -1,4 +1,3 @@
-import utils
 import flask
 from redis.exceptions import RedisError
 from logger import logger

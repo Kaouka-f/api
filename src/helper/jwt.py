@@ -2,12 +2,13 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 import os
-from flask import request, jsonify
+from flask import jsonify
+import flask
 from functools import wraps
 from flask import g
-from redis_client import redis_client as r
+from core.redis_client import redis_client as r
 
-from api.src.schema.models import User
+from schema.models import User
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 EXPIRED_DELAY = 30 * 24 * 3600
@@ -21,8 +22,8 @@ def token_required(f):
         token = None
 
         # Extract token from the Authorization header
-        if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]  # "Bearer <token>"
+        if 'Authorization' in flask.request.headers:
+            token = flask.request.headers['Authorization'].split(" ")[1]  # "Bearer <token>"
 
         if not token:
             return jsonify({"error": "Token manquant"}), 401

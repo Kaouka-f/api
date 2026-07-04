@@ -1,4 +1,3 @@
-import utils
 import redis
 from redis.exceptions import RedisError
 import os
@@ -91,9 +90,4 @@ class RedisIface:
         self.redis.zrem(key, field)
 
     def check_id(self, encodedId):
-        if (encodedId == None):
-            return None
-        id, privateId = utils.decodeId(encodedId)
-        if privateId == self.redis.hget(id, 'privateid'):
-            return id
         return None
