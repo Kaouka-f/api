@@ -157,7 +157,7 @@ class Proxy:
         self.app.route('/proxy/postLocation',
                        methods=['POST'])(postLocationEntry)
         self.app.route('/proxy/signUp', methods=['POST'])(signUpEntry)
-        self.app.route('/proxy/refreshToken', methods=['POST'])(refreshEntry)
+        self.app.route('/proxy/refreshToken', methods=['POST'])(refresh)
         # Stream
         self.app.route('/proxy/stream/<path:subpath>',
                        methods=['GET'])(stream_file)
