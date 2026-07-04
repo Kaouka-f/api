@@ -1,42 +1,43 @@
+import datetime
+
+import jwt
+import os
+
 from logger import logger
 import flask
 from flask import g
-import utils
+from api.src.token import create_persistent_token, create_session_token
 
 from sqlalchemy import select
 
 from schema.models import User
 
-def connect(email, password):
+SECRET_KEY = os.environ.get("SECRET_KEY")
+EXPIRED_DELAY = 30 * 24 * 3600
+
+def connect(email, password, notif_token):
     db = g.db
     try:
         user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
 
         if not user or user.password != password:
             return {"error": "Email ou mot de passe incorrect"}, 401
-        # TODO: handle notif token
-        # token = redis.redis_hget(id, 'notifToken')
-        # utils.delete_fcm_instance(token)
         
-        # TODO: JWT
-        # JWT creation
-        # payload = {
-        #     "user_id": 123,
-        #     "username": "john_doe",
-        #     "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Expiry time
-        # }
-        # secret_key = "your-secret-key"
-        # token = jwt.encode(payload, secret_key, algorithm="HS256")
-        # JWT use
+        # notif token
+        user = db.execute(select(User).where(User.id == id)).scalar_one_or_none()
+        if user:
+            # token = redis.redis_hget(id, 'notifToken')
+            # utils.delete_fcm_instance(notif_token)
+            user.notif_token = notif_token
+            db.commit()
+        
+        # JWT persistent token creation
+        persistent_token = create_persistent_token(user.id)
 
-        # TODO: get secret key in database, make token in arg
-        # token = ""
-        # secret_key = ""
-        # decoded_token = jwt.decode(token, secret_key, algorithms=["HS256"])
-        # print(decoded_token)
-        # return {'connected': False, 'key': token}
+        # JWT access token creation
+        session_token = create_session_token(user.id)
 
-        return {"connection":"sucess"}, 200
+        return {"connection":"sucess", "session_token": session_token, "persistent_token": persistent_token}, 200
     except Exception as e:
         print(f"Error while working with MongoDB: {e}")
 
@@ -46,10 +47,11 @@ def connectEntry():
         request_json = request.get_json()
         email = request_json['email']
         password = request_json['password']
+        notif_token = request_json.get('notifToken', None)
         print(f"Received email: {email}, password: {password}")
         if not email or not password:
             return {"presubscribe": True, "info": "missing_fields"}
-        return connect(email, password)
+        return connect(email, password, notif_token)
     except Exception as e:
         logger.critical("proxy postConnect args error: " + str(e))
         return {}

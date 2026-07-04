@@ -53,6 +53,7 @@ from post.deleteInterressed import deleteInterressedEntry
 from post.blockUser import blockUserEntry
 from post.postLocation import postLocationEntry
 from post.signUp import signUpEntry
+from post.refreshToken import refresh
 
 # ANALYZER
 from analyzer.getBots import getBotsEntry
@@ -156,7 +157,7 @@ class Proxy:
         self.app.route('/proxy/postLocation',
                        methods=['POST'])(postLocationEntry)
         self.app.route('/proxy/signUp', methods=['POST'])(signUpEntry)
-
+        self.app.route('/proxy/refreshToken', methods=['POST'])(refreshEntry)
         # Stream
         self.app.route('/proxy/stream/<path:subpath>',
                        methods=['GET'])(stream_file)
