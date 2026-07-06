@@ -21,7 +21,7 @@ def connect(email, password, notif_token):
         user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
 
         if not user or user.password != password:
-            return {"error": "Email ou mot de passe incorrect"}, 401
+            return {"status": "error", "message": "Email ou mot de passe incorrect"}, 401
         
         # notif token
         user = db.execute(select(User).where(User.id == id)).scalar_one_or_none()
@@ -37,9 +37,10 @@ def connect(email, password, notif_token):
         # JWT access token creation
         session_token = create_session_token(user.id)
 
-        return {"connection":"sucess", "session_token": session_token, "persistent_token": persistent_token}, 200
+        return {"status": "success", "data": {"session_token": session_token, "persistent_token": persistent_token}}, 200
     except Exception as e:
         print(f"Error while working with MongoDB: {e}")
+        return {"status": "error", "message": "Internal server error"}, 500
 
 def connectEntry():
     try:
@@ -50,8 +51,8 @@ def connectEntry():
         notif_token = request_json.get('notifToken', None)
         print(f"Received email: {email}, password: {password}")
         if not email or not password:
-            return {"presubscribe": True, "info": "missing_fields"}
+            return {"status": "error", "message": "missing_fields"}
         return connect(email, password, notif_token)
     except Exception as e:
         logger.critical("proxy postConnect args error: " + str(e))
-        return {}
+        return {"status": "error", "message": "Internal server error"}, 500

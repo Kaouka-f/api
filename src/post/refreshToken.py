@@ -14,11 +14,11 @@ def refresh():
 
     status = verify_persistent_token(user_id, persistent_token)
     if status == "invalid":
-        return {"error": "Token invalide"}, 401
+        return {"status": "error"}, 401
     elif status == "expired":
-        return {"error": "Token expiré"}, 401
+        return {"status": "error"}, 401
 
     # Générer un nouveau session token
     new_session_token = create_session_token(user_id)
 
-    return {"session_token": new_session_token}, 200
+    return {"status": "success", "data": {"session_token": new_session_token}}, 200
