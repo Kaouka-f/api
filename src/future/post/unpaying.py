@@ -10,5 +10,5 @@ def unPaying(self, id, email, password):
             return {'update': False}
         return {'update': True}
     except errors.PyMongoError as e:
-        print(f"Error while working with MongoDB: {e}")
+        print(f"kaouka internal error: : {e}")
         self.log.log_crash("proxy Error in unPaying while working with MongoDB: " + str(e))

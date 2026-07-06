@@ -5,7 +5,10 @@ from logger import logger
 from get.getRequest import getRequest
 import os
 from helper.media import mediaType, create_video_thumbnail
+from helper.jwt import token_required
 
+# TODO: maybe token not required for preview, but for now we keep it to avoid spam and abuse
+@token_required
 def preview(reqId):
     # Fetch data from the external API
     req = getRequest(reqId)

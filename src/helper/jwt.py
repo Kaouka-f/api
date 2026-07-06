@@ -10,7 +10,7 @@ from core.redis_client import redis_client as r
 
 from schema.models import User
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")  # Use a default value for testing
 EXPIRED_DELAY = 30 * 24 * 3600
 
 
@@ -26,7 +26,7 @@ def token_required(f):
             token = flask.request.headers['Authorization'].split(" ")[1]  # "Bearer <token>"
 
         if not token:
-            return jsonify({"error": "Token manquant"}), 401
+            return {"status":"unauthorized", "error": "Token manquant"}, 401
 
         try:
             # decode token
@@ -34,10 +34,10 @@ def token_required(f):
             current_user = db.session.query(User).get(payload['user_id'])
 
         except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token expiré"}), 401
+            return {"status":"unauthorized", "error": "Token expiré"}, 401
         except jwt.InvalidTokenError:
             # TODO: disconnect user by removing the persistent token from the database
-            return jsonify({"error": "Token invalide"}), 401
+            return {"status":"unauthorized", "error": "Token invalide"}, 401
 
         return f(current_user, *args, **kwargs)
 
@@ -58,7 +58,7 @@ def create_persistent_token(user_id, email):
         "user_id": str(user_id),
         "email": email,
         "type": "persistent",
-        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(seconds=EXPIRED_DELAY) 
+        "exp": datetime.now(timezone.utc) + timedelta(seconds=EXPIRED_DELAY) 
     }
     persistent_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")    
     r.setex(
@@ -71,13 +71,11 @@ def create_persistent_token(user_id, email):
 # Au persistent → vérifier qu'il est valide
 def verify_persistent_token(user_id, persistent_token):
     stored = r.get(f"{user_id}:persistent_token")
-    if stored.decode() != persistent_token:
-        revoke_persistent_token(user_id)
-        return "invalid"
-    elif stored is None:
+    if stored is None:
         return "expired"
-    elif stored.decode() == persistent_token:
+    if stored == persistent_token:
         return "valid"
+    revoke_persistent_token(user_id)
     return "invalid"
     
 

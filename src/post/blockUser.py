@@ -1,9 +1,11 @@
 import json
 import flask
+from helper.jwt import token_required
 from logger import logger
 from redisIface import RedisIface
 from redis.exceptions import RedisError
 
+@token_required
 def blockUser(id, userId):
     redis = RedisIface()
     # Check if id is valid

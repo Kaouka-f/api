@@ -12,10 +12,10 @@ from sqlalchemy import select
 
 from schema.models import User
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")  # Use a default value for testing
 EXPIRED_DELAY = 30 * 24 * 3600
 
-def connect(email, password, notif_token):
+def connect(email, password, notif_token=None):
     db = g.db
     try:
         user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
@@ -24,22 +24,23 @@ def connect(email, password, notif_token):
             return {"status": "error", "message": "Email ou mot de passe incorrect"}, 401
         
         # notif token
-        user = db.execute(select(User).where(User.id == id)).scalar_one_or_none()
-        if user:
+        user = db.execute(select(User).where(User.id == user.id)).scalar_one_or_none()
+        if user and user.notif_token and user.notif_token != notif_token:
             # token = redis.redis_hget(id, 'notifToken')
             # utils.delete_fcm_instance(notif_token)
+            print(f"notif token changed for user {user.id}: {user.notif_token} -> {notif_token}")
             user.notif_token = notif_token
             db.commit()
         
         # JWT persistent token creation
-        persistent_token = create_persistent_token(user.id)
+        persistent_token = create_persistent_token(user.id, email)
 
         # JWT access token creation
         session_token = create_session_token(user.id)
 
         return {"status": "success", "data": {"session_token": session_token, "persistent_token": persistent_token}}, 200
     except Exception as e:
-        print(f"Error while working with MongoDB: {e}")
+        print(f"kaouka internal error: : {e}")
         return {"status": "error", "message": "Internal server error"}, 500
 
 def connectEntry():
@@ -49,7 +50,7 @@ def connectEntry():
         email = request_json['email']
         password = request_json['password']
         notif_token = request_json.get('notifToken', None)
-        print(f"Received email: {email}, password: {password}")
+        print(f"Received email: {email}, password: {password}, notifToken: {notif_token}")
         if not email or not password:
             return {"status": "error", "message": "missing_fields"}
         return connect(email, password, notif_token)

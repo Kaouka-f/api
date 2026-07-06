@@ -6,6 +6,9 @@ from logger import logger
 from redisIface import RedisIface
 from helper.media import FILE_PATH
 
+from helper.jwt import token_required
+
+@token_required
 def deleteMsgs(id):
     try:
         redis = RedisIface()

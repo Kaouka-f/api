@@ -3,7 +3,9 @@ from redis.exceptions import RedisError
 from logger import logger
 from redisIface import RedisIface
 
+from helper.jwt import token_required
 
+@token_required
 def getLikes(reqId):
     redis = RedisIface()
     try:

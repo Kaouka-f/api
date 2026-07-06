@@ -1,6 +1,8 @@
 import uuid
 from redisIface import RedisIface
+from helper.jwt import token_required
 
+@token_required
 def getId():
     redis = RedisIface()
     id = str(uuid.uuid4())

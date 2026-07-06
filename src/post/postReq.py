@@ -12,7 +12,9 @@ from helper.file import createFile
 
 from schema.database import SessionLocal
 from schema.models import Request, User
+from helper.jwt import token_required
 
+@token_required
 def postReq(id, req, file):
     redis = RedisIface()
     db = g.db

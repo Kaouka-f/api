@@ -2,7 +2,9 @@ import flask
 from redis.exceptions import RedisError
 from logger import logger
 from redisIface import RedisIface
+from helper.jwt import token_required
 
+@token_required
 def visible(id, value):
     redis = RedisIface()
     try:

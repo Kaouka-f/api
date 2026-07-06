@@ -10,7 +10,9 @@ from sqlalchemy import select
 
 from schema.models import User
 
+from helper.jwt import token_required
 
+@token_required
 def onConnection(id):
     redis = RedisIface()
     db = g.db

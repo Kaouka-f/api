@@ -2,7 +2,10 @@ import flask
 from logger import logger
 from redisIface import RedisIface
 
+from helper.jwt import token_required
 
+# TODO: maybe token not required because of preview for getRequest, but for now we keep it to avoid spam and abuse
+@token_required
 def getRequest(reqid):
     try:
         redis = RedisIface()

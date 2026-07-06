@@ -2,7 +2,9 @@ import json
 import flask
 from logger import logger
 from redisIface import RedisIface
+from helper.jwt import token_required
 
+@token_required
 def getAllReqs(id, lastReqId):
     size = 40960
     try:

@@ -9,7 +9,9 @@ import os
 from firebase_admin import messaging
 from helper.file import createFile
 from helper.firebase import sendNotif
+from helper.jwt import token_required
 
+@token_required
 def postComments(id, postId, comment, file):
     redis = RedisIface()
     # Check if id is valid

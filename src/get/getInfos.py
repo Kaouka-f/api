@@ -1,7 +1,9 @@
 import flask
 from logger import logger
 from redisIface import RedisIface
+from helper.jwt import token_required
 
+@token_required
 def getInfos(personid):
     try:
         if personid:

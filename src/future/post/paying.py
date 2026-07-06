@@ -10,5 +10,5 @@ def paying(self, id, offer, payId):
             self.collection.update_one(query, update)
         return 0
     except errors.PyMongoError as e:
-        print(f"Error while working with MongoDB: {e}")
+        print(f"kaouka internal error: : {e}")
         self.log.log_crash("proxy Error in paying while working with MongoDB: " + str(e))

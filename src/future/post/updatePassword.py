@@ -7,4 +7,4 @@ def updatePassword(self, id, email, password, newPassword):
             update = {'$set': {'password': newPassword}}
             self.collection.update_one(query, update)
     except errors.PyMongoError as e:
-        print(f"Error while working with MongoDB: {e}")
+        print(f"kaouka internal error: : {e}")

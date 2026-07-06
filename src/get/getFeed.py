@@ -6,7 +6,9 @@ from redisIface import RedisIface
 
 FILE_PATH = '/opt/files/videos'
 PREFIX_URL = "http://192.168.1.22:8001/videos/"
+from helper.jwt import token_required
 
+@token_required
 def getFeed(id):
     try:
         redis = RedisIface()

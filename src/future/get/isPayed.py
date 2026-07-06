@@ -5,4 +5,4 @@ def isPayed(self, id):
         result_list = list(result)
         return {'payed': result_list['pay']}
     except errors.PyMongoError as e:
-        print(f"Error while working with MongoDB: {e}")
+        print(f"kaouka internal error: : {e}")

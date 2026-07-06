@@ -8,7 +8,9 @@ from redisIface import RedisIface
 from helper.file import createFile
 from helper.firebase import sendNotif
 
+from helper.jwt import token_required
 
+@token_required
 def sendMsg(targetPersonId, personId, message, file):
     redis = RedisIface()
     try:

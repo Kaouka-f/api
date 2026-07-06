@@ -4,7 +4,9 @@ from logger import logger
 from redisIface import RedisIface
 from post.deleteReq import deleteReqStatic
 from get.getAllReqs import getAllReqs
+from helper.jwt import token_required
 
+@token_required
 def deleteAccountStatic(redis, id):
     try:
         # delete push notif token

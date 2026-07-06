@@ -4,7 +4,9 @@ import os
 from flask import Response
 from werkzeug.utils import secure_filename
 BASE_DIRECTORY = "/opt/files"
+from helper.jwt import token_required
 
+@token_required
 def secure_path(subpath):
     # Secure each segment of the path
     safe_segments = [secure_filename(segment) for segment in subpath.split('/')]

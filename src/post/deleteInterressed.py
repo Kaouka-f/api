@@ -5,6 +5,9 @@ from logger import logger
 from helper.firebase import sendNotif
 from redisIface import RedisIface
 
+from helper.jwt import token_required
+
+@token_required
 def deleteInterressed(id, reqId):
     redis = RedisIface()
     try:

@@ -3,7 +3,9 @@ from logger import logger
 from redisIface import RedisIface
 from helper.file import createFile
 
+from helper.jwt import token_required
 
+@token_required
 def postPP(id, pp):
     redis = RedisIface()
     try:
