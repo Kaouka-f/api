@@ -31,7 +31,7 @@ def token_required(f):
         try:
             # decode token
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            current_user = db.session.query(User).get(payload['user_id'])
+            current_user = db.query(User).get(payload['user_id'])
 
         except jwt.ExpiredSignatureError:
             return {"status":"unauthorized", "error": "Token expiré"}, 401
