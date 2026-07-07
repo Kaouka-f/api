@@ -1,27 +1,17 @@
-import flask
 from redis.exceptions import RedisError
 from logger import logger
-from redisIface import RedisIface
 from helper.jwt import token_required
+from core.redis_client import redis_client as r
 
 @token_required
-def onDisconnection(id):
-    redis = RedisIface()
+def onDisconnection(current_user):
     try:
-        # Check if id is valid
-        id = redis.check_id(id)
-        if id == None:
-            del redis
-            logger.critical("proxy onDisconnection id error")
-            return {}
-        redis.redis_hset(f"user:{id}", 'connected', 'false')
+        r.hset(f"user:{current_user.id}", 'connected', 'false')
         # self.nb_conn -= 1
-        del redis
-        return {}
+        return {"status":"success"}, 200
     except RedisError as e:
-        del redis
         logger.critical("proxy onDisconnection error redis: " + str(e))
-        return {}
+        return {"status":"error"}, 500
     except Exception as e:
-        del redis
         logger.critical("proxy onDisconnection args error: " + str(e))
+        return {"status":"error"}, 500

@@ -1,44 +1,17 @@
-import flask
 from redis.exceptions import RedisError
 from logger import logger
-from redisIface import RedisIface
-import datetime
-
-from flask import g
-
-from sqlalchemy import select
-
-from schema.models import User
-
 from helper.jwt import token_required
+from core.redis_client import redis_client as r
 
 @token_required
-def onConnection(id):
-    redis = RedisIface()
-    db = g.db
+def onConnection(current_user):
     try:
-        # Check if id is valid
-        id = redis.check_id(id)
-        if id == None:
-            del redis
-            logger.critical("proxy onConnection id error")
-            return {}
-        print(datetime.date.today())
-        user = db.execute(select(User).where(User.id == id)).scalar_one_or_none()
-        if user:
-            user.last_conn = datetime.date.today()
-            db.commit()
-        else:
-            logger.critical("proxy onConnection user not found")
-            del redis
-            return {}
-        redis.redis_hset(f"user:{id}", 'connected', 'true')
-        del redis
-        return {}
+        r.hset(f"user:{current_user.id}", 'connected', 'true')
+        # self.nb_conn += 1
+        return {"status":"success"}, 200
     except RedisError as e:
-        del redis
         logger.critical("proxy onConn error redis: " + str(e))
-        return {}
+        return {"status":"error"}, 500
     except Exception as e:
-        del redis
         logger.critical("proxy onConn args error: " + str(e))
+        return {"status":"error"}, 500
