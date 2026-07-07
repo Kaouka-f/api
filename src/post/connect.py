@@ -6,7 +6,6 @@ from flask import g
 from helper.jwt import create_persistent_token, create_session_token
 from sqlalchemy import select
 from schema.models import User
-from core.redis_client import redis_client as r
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")  # Use a default value for testing
 EXPIRED_DELAY = 30 * 24 * 3600
@@ -21,7 +20,6 @@ def connect(email, password, notif_token=None):
         
         
         # connexion infos
-        r.hset(f"user:{user.id}", 'connected', 'true')
         user.last_conn = datetime.date.today()
         db.commit()
 
