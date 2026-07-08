@@ -1,34 +1,17 @@
-import json
 import flask
 from logger import logger
-from redisIface import RedisIface
 from helper.jwt import token_required
+from core.redis_client import redis_client as r
 
 @token_required
-def postName(id, name):
-    redis = RedisIface()
-    try:
-        # Check if id is valid
-        id = redis.check_id(id)
-        if id == None:
-            del redis
-            logger.critical("proxy postName id error")
-            return {}
-        redis.redis_hset(f"user:{id}", 'name', name)
-        del redis
-        return {}
-    except Exception as e:
-        del redis
-        logger.critical("proxy Error while working postName with Redis: " + str(e))
-        return {}
-
-def postNameEntry():
+def postNameEntry(current_user, name):
     try:
         request = flask.request
         request_json = request.get_json()
         id = request_json['id']
         name = request_json['name']
-        return postName(id, name)
+        r.hset(f"user:{current_user.id}", 'name', name)
+        return {"status": "success"}, 200
     except Exception as e:
-        logger.critical("proxy postNameEntry args error: " + str(e))
-        return {}
+        logger.critical("proxy Error while working postName with Redis: " + str(e))
+        return {"status": "error", "message": "Internal server error"}, 500

@@ -1,34 +1,17 @@
-import json
 import flask
+from flask import g
 from logger import logger
-from redisIface import RedisIface
 from helper.jwt import token_required
 
 @token_required
-def postNotifToken(id, notifToken):
-    redis = RedisIface()
-    try:
-        # Check if id is valid
-        id = redis.check_id(id)
-        if id == None:
-            del redis
-            logger.critical("proxy postNotifToken id error")
-            return {}
-        redis.redis_hset(id, 'notifToken', notifToken)
-        del redis
-        return {}
-    except Exception as e:
-        del redis
-        logger.critical("proxy Error while working postNotifToken with Redis: " + str(e))
-        return {}
-
-def postNotifTokenEntry():
+def postNotifTokenEntry(current_user, notifToken):
+    db = g.db
     try:
         request = flask.request
         request_json = request.get_json()
-        id = request_json['id']
         notifToken = request_json['notifToken']
-        return postNotifToken(id, notifToken)
+        db.execute("UPDATE users SET notif_token = :notifToken WHERE id = :id", {"notifToken": notifToken, "id": current_user.id})
+        return {"status": "success"}, 200
     except Exception as e:
-        logger.critical("proxy postNotifTokenEntry args error: " + str(e))
-        return {}
+        logger.critical("proxy Error while working postNotifToken with Redis: " + str(e))
+        return {"status": "error", "message": "Internal server error"}, 500

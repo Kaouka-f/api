@@ -2,44 +2,26 @@ import flask
 from logger import logger
 from redisIface import RedisIface
 from helper.file import createFile
-
 from helper.jwt import token_required
+from core.redis_client import redis_client as r
 
 @token_required
-def postPP(id, pp):
-    redis = RedisIface()
-    try:
-        # Check if id is valid
-        id = redis.check_id(id)
-        if id is None:
-            del redis
-            logger.critical("proxy postPP id error")
-            return {}
-        file_present = False
-        ppname = ""
-        if pp is not None:
-            # TODO: need authentication
-            ppname = createFile(pp, id)
-            file_present = True
-        if file_present:
-            redis.redis_hset(f"user:{id}", 'img', ppname)
-        del redis
-        return ppname
-    except Exception as e:
-        logger.critical(
-            "proxy Error while working postPP with Redis: " + str(e))
-        return 'unset'
-
-
-def postPPEntry():
+def postPPEntry(current_user):
     try:
         request = flask.request
-        id = request.args.get('id')
         pp = None
         if 'file' in request.files:
             pp = request.files['file']
             print(request.files['file'])
-        return postPP(id, pp)
+        file_present = False
+        ppname = ""
+        if pp is not None:
+            ppname = createFile(pp, current_user.id)
+            file_present = True
+        if file_present:
+            r.hset(f"user:{current_user.id}", 'img', ppname)
+        return {"status": "success", "data": {"ppname": ppname}}, 200
     except Exception as e:
-        logger.critical("proxy postPPEntry args error: " + str(e))
-        return 'unset'
+        logger.critical(
+            "proxy Error while working postPP with Redis: " + str(e))
+        return {"status": "error", "message": "Internal server error"}, 500

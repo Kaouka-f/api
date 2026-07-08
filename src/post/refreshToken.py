@@ -1,9 +1,7 @@
 import jwt
 from helper.jwt import create_session_token, verify_persistent_token
 import flask
-import os
-
-SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")  # Use a default value for testing
+from helper.jwt import SECRET_KEY
 
 def refresh():
     data = flask.request.get_json()
